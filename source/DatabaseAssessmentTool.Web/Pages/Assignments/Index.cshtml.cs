@@ -19,5 +19,6 @@ public class IndexModel : PageModel
     public async Task OnGet()
     {
         Assignments = await _db.Connection.QueryAsync<Assignment>("use DbExpert; exec MyAssignments");
+        var results = await _db.Connection.QueryAsync<AssignmentResult>("use DbExpert; exec CheckAssignments");
     }
 }
