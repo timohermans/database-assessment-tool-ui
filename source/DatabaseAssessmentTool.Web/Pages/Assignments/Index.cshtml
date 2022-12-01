@@ -4,3 +4,13 @@
 }
 
 <h1>Assignments</h1>
+
+<ul>
+    @foreach (var assignment in Model.Assignments)
+    {
+        <li>
+            <div>@assignment.AssignmentNr</div>
+            <div>@assignment.AssignmentText</div>
+        </li>
+    }
+</ul>
