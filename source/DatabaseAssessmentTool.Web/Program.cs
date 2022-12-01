@@ -1,3 +1,5 @@
+using Dapper.FluentMap;
+using DatabaseAssessmentTool.Web.Models;
 using DatabaseAssessmentTool.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +32,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(KeyConstants.PolicyForAdminKey,
          policy => policy.RequireRole(KeyConstants.ClaimRoleAdmin));
 });
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookieOptions => {
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookieOptions =>
+{
     cookieOptions.LoginPath = "/Authentication/Login";
 });
 builder.Services.AddDataProtection();
@@ -38,6 +41,8 @@ builder.Services.AddSingleton<IPasswordProtector, PasswordProtector>();
 #endregion
 
 builder.Services.AddScoped<IAssessmentToolDbProvider, AssessmentToolDbProvider>();
+
+FluentMapper.Initialize(config => config.AddMap(new AssignmentResultMap()));
 
 var app = builder.Build();
 

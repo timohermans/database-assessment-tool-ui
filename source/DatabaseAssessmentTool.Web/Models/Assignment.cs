@@ -11,4 +11,8 @@ public class Assignment
     public required double Points { get; set; }
     public required string Comments { get; set; }
     public required double TotalPoints { get; set; }
+    public AssignmentResult? Result { get; set; }
+
+    public bool IsTurnedIn => Result?.Delivered == "Y";
+    public string Score => IsTurnedIn ? $"{Points - Math.Abs(Result?.QueryResult?.Points ?? 0)}/{Points}" : $"~/{Points}";
 }

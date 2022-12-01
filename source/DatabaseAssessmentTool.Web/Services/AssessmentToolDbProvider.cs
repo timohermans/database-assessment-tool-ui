@@ -16,7 +16,6 @@ public class AssessmentToolDbProvider : IAssessmentToolDbProvider
 
     public AssessmentToolDbProvider(IConfiguration config, IHttpContextAccessor httpContextAccessor, IPasswordProtector protector)
     {
-        FluentMapper.Initialize(config => config.AddMap(new AssignmentResultMap()));
 
         _databaseUrl = config.GetValue<string>("DatabaseUrl") ?? throw new InvalidOperationException("DatabaseUrl not set in appsettings");
         _username = httpContextAccessor.HttpContext?.User.Identity?.Name;
