@@ -1,18 +1,20 @@
+using DatabaseAssessmentTool.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
 {
     options.Conventions.AuthorizeFolder("/");
     options.Conventions.AuthorizeFolder("/");
+    options.Conventions.AuthorizeFolder("/Students", KeyConstants.PolicyForAdminKey);
     options.Conventions.AllowAnonymousToFolder("/Authentication");
     options.Conventions.AllowAnonymousToPage("/Index");
 });
-builder.Services.AddHttpContextAccessor();
 
+#region authentication specific
+builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Cookie settings
@@ -23,11 +25,19 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Authentication/AccessDenied";
     options.SlidingExpiration = true;
 });
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(KeyConstants.PolicyForAdminKey,
+         policy => policy.RequireRole(KeyConstants.ClaimRoleAdmin));
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookieOptions => {
     cookieOptions.LoginPath = "/Authentication/Login";
 });
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton<IPasswordProtector, PasswordProtector>();
+#endregion
 
+builder.Services.AddScoped<IAssessmentToolDbProvider, AssessmentToolDbProvider>();
 
 var app = builder.Build();
 

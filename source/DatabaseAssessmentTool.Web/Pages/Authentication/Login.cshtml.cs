@@ -1,4 +1,5 @@
 using Dapper;
+using DatabaseAssessmentTool.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -11,46 +12,39 @@ namespace DatabaseAssessmentTool.Web.Pages.Authentication;
 
 public class LoginModel : PageModel
 {
-    public class Request
-    {
-        [Required]
-        public required string Username { get; set; }
-        [Required]
-        public required string Password { get; set; }
-    }
+    private readonly IAssessmentToolDbProvider _dbProvider;
+    private readonly IPasswordProtector _protector;
 
-    private readonly string _databaseUrl;
-
+    [Required]
     [BindProperty]
-    public required Request LoginRequest { get; set; }
-
+    public required string Username { get; set; }
+    [Required]
+    [BindProperty]
+    public required string Password { get; set; }
     public string? ErrorMessage { get; set; }
 
-    public LoginModel(IConfiguration config)
+    public LoginModel(IAssessmentToolDbProvider dbProvider, IPasswordProtector protector)
     {
-        _databaseUrl = config.GetValue<string>("DatabaseUrl") ?? throw new InvalidOperationException("DatabaseUrl not set in appsettings");
+        _dbProvider = dbProvider;
+        _protector = protector;
     }
 
     public void OnGet()
     {
     }
 
+    /**
+     *  based on https://www.mikesdotnetting.com/article/335/simple-authentication-in-razor-pages-without-a-database
+     */
     public async Task<IActionResult> OnPostAsync(string? returnUrl)
     {
-        var connectionString = $"Server={_databaseUrl};User Id={LoginRequest.Username};Password={LoginRequest.Password};";
-
-        using var connection = new SqlConnection(connectionString);
+        _dbProvider.UpdateCredentials(Username, Password);
+        var connection = _dbProvider.Connection;
 
         ErrorMessage = await TryLogInAsync(connection);
         if (!string.IsNullOrEmpty(ErrorMessage)) return Page();
-        bool isAdmin = await GetIsAdminAsync(connection);
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, LoginRequest.Username),
-            new Claim(ClaimTypes.Role, isAdmin ? "admin" : "user"),
-        };
-
+        var isAdmin = await GetIsAdminAsync(connection);
+        var claims = CreateClaims(isAdmin);
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
@@ -84,4 +78,16 @@ public class LoginModel : PageModel
 
         return null;
     }
+    private List<Claim> CreateClaims(bool isAdmin)
+    {
+        var protectedPassword = _protector.Protect(Password);
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, Username),
+            new Claim(ClaimTypes.Role, isAdmin ? KeyConstants.ClaimRoleAdmin : "user"),
+            new Claim(KeyConstants.ClaimKeyDatabasePassword, protectedPassword)
+        };
+        return claims;
+    }
+
 }
