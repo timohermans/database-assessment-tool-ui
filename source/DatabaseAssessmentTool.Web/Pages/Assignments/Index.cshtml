@@ -3,31 +3,38 @@
 @{
 }
 
-<section style="min-width: 400px;">
+<section class="mx-auto" style="min-width: 400px; max-width: 900px;">
     <h1>Assignments (@Model.Assignments.Items.Count)</h1>
 
-    <ul class="list-group">
-        @foreach (var assignment in Model.Assignments.Items)
-        {
-            <li class="list-group-item list-group-item-action">
-                <a asp-page="/Assignments/Practice" asp-route-id="@assignment.AssignmentPrimaryNr" class="d-flex text-black text-decoration-none">
-                    <section class="align-self-center me-3">@assignment.AssignmentNr</section>
-                    <section class="flex-grow-1">
-                        <h2>
-                            @if (assignment.IsTurnedIn)
-                            {
-                                <span title="You've done the assignment, good job!">✅</span>
-                            }
-                            @assignment.DatabaseName
-                        </h2>
-                        <p class="text-muted">@assignment.AssignmentText</p>
-                    </section>
-                    <section class="ms-3 text-nowrap">
-                        <p>@assignment.Score</p>
-                        <p>⏰ @assignment.TimeLeft</p>
-                    </section>
-                </a>
-            </li>
-        }
-    </ul>
+    @if (Model.Assignments.Items.Any())
+    {
+        <ul class="list-group">
+            @foreach (var assignment in Model.Assignments.Items)
+            {
+                <li class="list-group-item list-group-item-action">
+                    <a asp-page="/Assignments/Practice" asp-route-id="@assignment.AssignmentPrimaryNr" class="d-flex text-black text-decoration-none">
+                        <section class="align-self-center me-3">@assignment.AssignmentNr</section>
+                        <section class="flex-grow-1">
+                            <h2>
+                                @if (assignment.IsTurnedIn)
+                                {
+                                    <span title="You've done the assignment, good job!">✅</span>
+                                }
+                                @assignment.DatabaseName
+                            </h2>
+                            <p class="text-muted">@assignment.AssignmentText</p>
+                        </section>
+                        <section class="ms-3 text-nowrap">
+                            <p>🎯 @assignment.Score</p>
+                            <p>⏰ @assignment.TimeLeft</p>
+                        </section>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>You do not have any assignments at the moment 👍.</p>
+    }
 </section>
