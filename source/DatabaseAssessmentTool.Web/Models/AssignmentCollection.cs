@@ -19,5 +19,10 @@ public class AssignmentCollection
         }
     }
 
+    public Assignment? GetBy(int id)
+    {
+        return Items.FirstOrDefault(a => a.AssignmentPrimaryNr == id);
+    }
+
 
 }
