@@ -7,19 +7,20 @@ namespace DatabaseAssessmentTool.Web.Pages.Assignments;
 
 public class IndexModel : PageModel
 {
-    private readonly IAssessmentToolDbProvider _db;
+    private readonly IAssessmentToolDbProvider _provider;
 
     public required AssignmentCollection Assignments { get; set; }
 
     public IndexModel(IAssessmentToolDbProvider db)
     {
-        _db = db;
+        _provider = db;
     }
 
     public async Task OnGet()
     {
-        var assignments = await _db.Connection.QueryAsync<Assignment>("use DbExpert; exec MyAssignments");
-        var results = await _db.Connection.QueryAsync<AssignmentResult>("use DbExpert; exec CheckAssignments");
+        using var db = _provider.Provide();
+        var assignments = await db.QueryAsync<Assignment>("use DbExpert; exec MyAssignments");
+        var results = await db.QueryAsync<AssignmentResult>("use DbExpert; exec CheckAssignments");
         Assignments = new AssignmentCollection(assignments, results);
     }
 }

@@ -39,11 +39,11 @@ public class LoginModel : PageModel
     public async Task<IActionResult> OnPostAsync(string? returnUrl)
     {
         _dbProvider.UpdateCredentials(Username, Password);
-        var connection = _dbProvider.Connection;
+        using var db = _dbProvider.Provide();
 
-        ErrorMessage = await TryLogInAsync(connection);
+        ErrorMessage = await TryLogInAsync(db);
         if (!string.IsNullOrEmpty(ErrorMessage)) return Page();
-        var isAdmin = await GetIsAdminAsync(connection);
+        var isAdmin = await GetIsAdminAsync(db);
         var claims = CreateClaims(isAdmin);
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));

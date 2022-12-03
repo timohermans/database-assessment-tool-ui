@@ -3,6 +3,17 @@
 @{
 }
 
+@section Scripts {
+    <environment include="Development">
+        <script src="http://localhost:5173/Scripts/practice.ts" type="module"></script>
+    </environment>
+    <environment include="Production">
+        <script asp-src-include="~/js/practice.*.js" type="module"></script>
+    </environment>
+}
+
+<input id="schemaInfo" type="hidden" value="@Model.SchemaInfo.ToJson()" />
+
 <h1>@Model.Assignment.DatabaseName assignment</h1>
 
 <p>
@@ -10,6 +21,4 @@
 </p>
 
 <form method="post">
-
-
 </form>
