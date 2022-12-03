@@ -1,0 +1,19 @@
+﻿@page "{database}"
+@model DatabaseAssessmentTool.Web.Pages.Assignments.DiagramModel
+@{
+}
+
+@section Scripts {
+    <environment include="Development">
+        <script src="http://localhost:5173/Scripts/diagram.ts" type="module"></script>
+    </environment>
+    <environment include="Production">
+        <script asp-src-include="~/js/practice.*.js" type="module"></script>
+    </environment>
+}
+
+<h1>@Model.Database</h1>
+
+<pre class="mermaid">
+    @Model.Schema.ToErdString()
+</pre>
