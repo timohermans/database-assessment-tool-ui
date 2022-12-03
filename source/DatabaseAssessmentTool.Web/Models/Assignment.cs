@@ -14,5 +14,19 @@ public class Assignment
     public AssignmentResult? Result { get; set; }
 
     public bool IsTurnedIn => Result?.Delivered == "Y";
-    public string Score => IsTurnedIn ? $"{Points - Math.Abs(Result?.QueryResult?.Points ?? 0)}/{Points}" : $"~/{Points}";
+    public string Score
+    {
+        get
+        {
+            if (!IsTurnedIn) return $"~/{Points}";
+            double pointsScored = 0;
+
+            if (Result?.StructureOK == "OK" && Result?.ColumnsCompare == "OK" && Result?.DataCorrect == "OK")
+            {
+                pointsScored = Points - Math.Abs(Result?.QueryResult?.Points ?? 0);
+            }
+
+            return $"{pointsScored}/{Points}";
+        }
+    }
 }
