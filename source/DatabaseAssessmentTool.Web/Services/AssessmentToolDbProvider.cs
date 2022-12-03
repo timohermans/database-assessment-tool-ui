@@ -11,7 +11,7 @@ public class AssessmentToolDbProvider : IAssessmentToolDbProvider
     private string? _username;
     private string? _password;
 
-    private string ConnectionString => $"Server={_databaseUrl};User Id={_username};Password={_password};";
+    private string ConnectionString => $"Server={_databaseUrl};Database=DBExpert;User Id={_username};Password={_password};";
 
     public AssessmentToolDbProvider(IConfiguration config, IHttpContextAccessor httpContextAccessor, IPasswordProtector protector)
     {
@@ -21,7 +21,7 @@ public class AssessmentToolDbProvider : IAssessmentToolDbProvider
         _password = string.IsNullOrEmpty(protectedPassword) ? null : protector.Unprotect(protectedPassword);
     }
 
-    public SqlConnection Provide() => new SqlConnection(ConnectionString);
+    public SqlConnection Provide(string? databaseName = null) => new SqlConnection(databaseName == null ? ConnectionString : ConnectionString.Replace("DBExpert", databaseName));
 
     public void UpdateCredentials(string username, string password)
     {

@@ -1,4 +1,6 @@
-﻿import { EditorView, basicSetup } from "codemirror";
+﻿import { EditorState } from "@codemirror/state"
+import { EditorView, basicSetup } from "codemirror";
+import { keymap } from "@codemirror/view"
 import { sql, MSSQL, SQLConfig } from "@codemirror/lang-sql";
 
 type TableColumnInfo = {
@@ -16,6 +18,7 @@ interface Completion {
 }
 
 const schemaInfoElement: HTMLInputElement = document.querySelector('#schemaInfo');
+const queryThatRan: HTMLInputElement = document.querySelector('#valRanQuery');
 const tableColumnItems: TableColumnInfo[] = JSON.parse(schemaInfoElement.value);
 const schema: Schema = tableColumnItems.reduce((result, item: TableColumnInfo) => {
     if (!(item.tableName in result)) result[item.tableName] = [];
@@ -30,7 +33,30 @@ const sqlConfig: SQLConfig = {
     schema
 }
 
-let view = new EditorView({
-    extensions: [basicSetup, sql(sqlConfig)],
-    parent: document.body
+function executeQuery() {
+    console.log("trying to execute");
+    console.log(view.state.doc);
+}
+
+function executeQueryKeymap() {
+    return keymap.of([{
+        key: "Ctrl-Enter",
+        run() { executeQuery(); return true }
+    }])
+}
+
+const view = new EditorView({
+    state: EditorState.create({
+        doc: queryThatRan.value ?? "",
+        extensions: [basicSetup, sql(sqlConfig), executeQueryKeymap()],
+    }),
+    parent: document.querySelector('#editor')
+});
+
+document.querySelector('#btnRunQuery').addEventListener('click', (event) => {
+    const isFinalQueryElement: HTMLInputElement = document.querySelector('#valQuery');
+    const queryElement: HTMLInputElement = document.querySelector('#valQuery');
+    isFinalQueryElement.value = 'false';
+    queryElement.value = view.state.doc.toString();
+    (event.target as HTMLButtonElement).form.submit();
 });

@@ -19,8 +19,8 @@ public class IndexModel : PageModel
     public async Task OnGet()
     {
         using var db = _provider.Provide();
-        var assignments = await db.QueryAsync<Assignment>("use DbExpert; exec MyAssignments");
-        var results = await db.QueryAsync<AssignmentResult>("use DbExpert; exec CheckAssignments");
+        var assignments = await db.QueryAsync<Assignment>("exec MyAssignments");
+        var results = await db.QueryAsync<AssignmentResult>("exec CheckAssignments");
         Assignments = new AssignmentCollection(assignments, results);
     }
 }

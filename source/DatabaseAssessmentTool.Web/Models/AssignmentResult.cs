@@ -45,7 +45,7 @@ namespace DatabaseAssessmentTool.Web.Models
             set
             {
                 _queryTextCheck = value;
-                if (_queryTextCheck == null) return;
+                if (_queryTextCheck == null || !_queryTextCheck.StartsWith("<Checks")) return;
                 using var stream = new StringReader(_queryTextCheck);
                 var serializer = new XmlSerializer(typeof(QueryResult));
                 QueryResult = (QueryResult?)serializer.Deserialize(stream);

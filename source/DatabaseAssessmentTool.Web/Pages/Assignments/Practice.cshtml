@@ -12,13 +12,95 @@
     </environment>
 }
 
+@section Styles {
+    <style>
+        #editor {
+            height: 200px;
+            max-height: 200px;
+        }
+
+        #results {
+            overflow-x: auto;
+        }
+
+        .cm-editor {
+            height: 100%;
+        }
+    </style>
+}
+
 <input id="schemaInfo" type="hidden" value="@Model.SchemaInfo.ToJson()" />
+<input id="valRanQuery" type="hidden" value="@Model.Query" />
 
 <h1>@Model.Assignment.DatabaseName assignment</h1>
+
+<a asp-page="./Diagram" asp-route-database="@Model.Assignment.DatabaseName" target="_blank">View database diagram</a>
 
 <p>
     @Model.Assignment.AssignmentText
 </p>
 
+<section class="row">
+    <div id="editor" class="col-6"></div>
+    @if (Model.Assignment.IsTurnedIn)
+    {
+        <div class="col-6">
+            <h2>Query result</h2>
+            <p>🎯 @Model.Assignment.Score</p>
+            <p>About the columns: @Model.Assignment.Result!.ColumnsCompare</p>
+            <p>About the data: @Model.Assignment.Result!.DataCorrect @(Model.Assignment.Result!.DataCorrect?.Contains("too late") ?? false ? $"(-{Model.Assignment.Points})" : "")</p>
+            @if (Model.Assignment.Result!.QueryResult != null)
+            {
+                <p>🚦 @Model.Assignment.Result!.QueryResult?.CheckResult</p>
+                <p>📄 @Model.Assignment.Result!.QueryResult?.CheckDescription</p>
+            }
+        </div>
+    }
+</section>
+
 <form method="post">
+    <input id="valIsFinalQuery" name="IsFinalQuery" type="hidden" />
+    <input id="valQuery" name="Query" type="hidden" />
+    <div>
+        <button id="btnRunQuery" class="btn btn-primary my-3" type="button">Run query</button>
+    </div>
 </form>
+
+<section id="results">
+    @if (Model.QueryError != null)
+    {
+        <p>@Model.QueryError</p>
+    }
+
+    @if (Model.QueryResult != null && !Model.QueryResult.Any())
+    {
+        <p>0 rows retrieved</p>
+    }
+
+    @if (Model.QueryResult != null && Model.QueryResult.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    @foreach (var property in (Model.QueryResult.First() as IDictionary<string, object>)!.Keys)
+                    {
+                        <th>@property</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (dynamic row in Model.QueryResult)
+                {
+                    <tr>
+                        @foreach (var column in (IDictionary<string, object>)row)
+                        {
+                            <td>@(column.Value ?? "NULL")</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+
+</section>

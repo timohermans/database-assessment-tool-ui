@@ -4,7 +4,7 @@ namespace DatabaseAssessmentTool.Web.Services
 {
     public interface IAssessmentToolDbProvider
     {
-        SqlConnection Provide();
+        SqlConnection Provide(string? databaseName = null);
         void UpdateCredentials(string username, string password);
     }
 }
