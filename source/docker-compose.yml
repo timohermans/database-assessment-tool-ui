@@ -4,8 +4,8 @@ services:
     container_name: database-assessment-tool-ui
     restart: unless-stopped
     build:
-      context: ../source
-      dockerfile: DatabaseAssesmentTool.Web/Dockerfile
+      context: .      
+      dockerfile: DatabaseAssessmentTool.Web/Dockerfile
     volumes:
       - /home/apper/data/database-assessment-tool:/etc/database-assessment-tool
     labels:
