@@ -19,6 +19,7 @@ steps:
     - cd /home/apper/projects/database-assessment-tool-ui
     - git checkout main
     - git pull
+    - cd source
     - docker-compose up -d --build
 
 trigger:
