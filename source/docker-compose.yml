@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  student-progress:
+    container_name: database-assessment-tool-ui
+    restart: unless-stopped
+    build:
+      context: ../source
+      dockerfile: DatabaseAssesmentTool.Web/Dockerfile
+    volumes:
+      - /home/apper/data/database-assessment-tool:/etc/database-assessment-tool
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.studentprogress.rule=HOST(`db-practice.timo-hermans.nl`)'
+      - 'traefik.http.services.studentprogress.loadbalancer.server.port=80'
+    networks:
+      - server
+
+networks:
+  server:
+    external: true

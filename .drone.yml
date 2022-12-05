@@ -1,0 +1,55 @@
+kind: pipeline
+type: docker
+name: build
+
+concurrency:
+  limit: 1
+
+steps:
+- name: test and build
+  image: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+  commands:
+    - cd source
+    - cd DatabaseAssessmentTool.Web && npm install
+    - dotnet restore
+    - dotnet build
+  environment:
+    ConnectionStrings__Test:
+      from_secret: connectionstringtest
+    canvas__url:
+      from_secret: canvasurl
+    canvas__key:
+      from_secret: canvaskey
+
+---
+
+kind: pipeline
+type: ssh
+name: deployment
+depends_on:
+  - build
+
+server:
+  host:
+    from_secret: host
+  user:
+    from_secret: user
+  password:
+    from_secret: password
+
+clone:
+  disable: true
+
+steps:
+  - name: move
+    commands:
+    - cd /home/apper/projects/database-assessment-tool-ui
+    - git checkout main
+    - git pull
+    - docker-compose up -d --build
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
