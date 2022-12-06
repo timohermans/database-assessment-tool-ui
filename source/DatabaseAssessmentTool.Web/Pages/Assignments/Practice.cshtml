@@ -1,6 +1,7 @@
 ﻿@page "{id:int}"
 @model DatabaseAssessmentTool.Web.Pages.Assignments.PracticeModel
 @{
+    ViewData["Title"] = "Assignment " + Model.Assignment.AssignmentNr;
 }
 
 @section Scripts {
@@ -32,7 +33,7 @@
 <input id="schemaInfo" type="hidden" value="@Model.SchemaInfo.ToJson()" />
 <input id="valRanQuery" type="hidden" value="@Model.Query" />
 
-<h1>@Model.Assignment.DatabaseName assignment</h1>
+<h1>@Model.Assignment.AssignmentNr - @Model.Assignment.DatabaseName assignment</h1>
 
 <a asp-page="./Diagram" asp-route-database="@Model.Assignment.DatabaseName" target="_blank">View database diagram</a>
 
