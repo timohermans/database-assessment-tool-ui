@@ -1,0 +1,29 @@
+kind: pipeline
+type: ssh
+name: deployment
+
+server:
+  host:
+    from_secret: host
+  user:
+    from_secret: user
+  password:
+    from_secret: password
+
+clone:
+  disable: true
+
+steps:
+  - name: move
+    commands:
+    - cd /home/apper/projects/database-assessment-tool-ui
+    - git checkout main
+    - git pull
+    - cd source
+    - docker-compose up -d --build
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
